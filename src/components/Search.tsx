@@ -41,7 +41,7 @@ export default class Search extends Component<SearchProps, SearchState> {
           className="bg-gray-700 text-white rounded-lg px-4 py-2
                    focus:outline-none focus:ring-2 focus:ring-blue-400
                    transition-all duration-200 flex-grow
-                   placeholder-gray-400"
+                   placeholder-gray-400 max-w-[180px] sm:max-w-[100%]"
         />
         <button
           onClick={this.handleSearch}
