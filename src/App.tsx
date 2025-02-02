@@ -1,35 +1,84 @@
-import { useState } from 'react';
-import reactLogo from './assets/react.svg';
-import viteLogo from '/vite.svg';
-import './App.css';
+import { Component } from 'react';
+import ErrorBoundary from './components/ErrorBoundary.tsx';
+import Header from './components/Header.tsx';
+import Footer from './components/Footer.tsx';
+import Main from './components/Main.tsx';
+import ErrorButton from './components/ErrorButton.tsx';
+import { Anime } from './types.ts';
+import { fetchAnime } from './api.ts';
+import Loader from './components/Loader.tsx';
+import ErrorFetch from './components/ErrorFetch.tsx';
 
-function App() {
-  const [count, setCount] = useState(0);
+interface AppState {
+  searchTerm: string;
+  animeList: Anime[];
+  loading: boolean;
+  error: string | null;
+}
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank" rel="noreferrer">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank" rel="noreferrer">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  );
+class App extends Component<object, AppState> {
+  constructor(props: object) {
+    super(props);
+    this.state = {
+      searchTerm: localStorage.getItem('searchTerm') || '',
+      animeList: [],
+      loading: false,
+      error: null,
+    };
+  }
+
+  componentDidMount() {
+    this.loadAnimeData('');
+  }
+
+  loadAnimeData = async (searchTerm: string) => {
+    try {
+      this.setState({ loading: true, error: null });
+      const animeList = await fetchAnime(searchTerm);
+      this.setState({ animeList });
+    } catch (error) {
+      this.setState({
+        error:
+          error instanceof Error
+            ? 'Произошла ошибка при загрузке данных'
+            : 'Неизвестная ошибка',
+      });
+    } finally {
+      this.setState({ loading: false });
+    }
+  };
+
+  handleSearch = (searchTerm: string) => {
+    const trimmedTerm = searchTerm.trim();
+    localStorage.setItem('searchTerm', trimmedTerm);
+    this.setState({ searchTerm: trimmedTerm }, () => {
+      this.loadAnimeData(trimmedTerm);
+    });
+  };
+
+  render() {
+    return (
+      <ErrorBoundary>
+        <div className="app min-h-screen flex flex-col">
+          <Header
+            searchTerm={this.state.searchTerm}
+            onSearch={this.handleSearch}
+          />
+
+          {this.state.loading ? (
+            <Loader />
+          ) : this.state.error ? (
+            <ErrorFetch errorMessage={this.state.error} />
+          ) : (
+            <Main animeList={this.state.animeList} />
+          )}
+
+          <ErrorButton />
+          <Footer />
+        </div>
+      </ErrorBoundary>
+    );
+  }
 }
 
 export default App;
