@@ -28,7 +28,7 @@ class App extends Component<object, AppState> {
   }
 
   componentDidMount() {
-    this.loadAnimeData('');
+    this.loadAnimeData(this.state.searchTerm);
   }
 
   loadAnimeData = async (searchTerm: string) => {
