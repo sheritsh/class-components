@@ -36,7 +36,9 @@ const Pagination: FC<PaginationProps> = ({
           >
             1
           </button>
-          {pages[0] > 2 && <span className="px-4 py-2 hover:cursor-pointer">...</span>}
+          {pages[0] > 2 && (
+            <span className="px-4 py-2 hover:cursor-pointer">...</span>
+          )}
         </>
       )}
 
