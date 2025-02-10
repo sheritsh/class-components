@@ -1,18 +1,20 @@
-import { Component } from 'react';
+import { FC, ReactNode } from 'react';
 import CardList from './CardList';
 import { Anime } from '../types';
 
 interface MainProps {
+  children?: ReactNode;
   animeList: Anime[];
+  onAnimeSelect: (anime: Anime) => void;
 }
 
-export default class Main extends Component<MainProps> {
-  render() {
-    const { animeList } = this.props;
-    return (
-      <div className="">
-        <CardList animeList={animeList} />
-      </div>
-    );
-  }
-}
+const Main: FC<MainProps> = ({ children, animeList, onAnimeSelect }) => {
+  return (
+    <main role="main" className="flex-grow container mx-auto px-4 py-8">
+      {children}
+      <CardList animeList={animeList} onAnimeSelect={onAnimeSelect} />
+    </main>
+  );
+};
+
+export default Main;
